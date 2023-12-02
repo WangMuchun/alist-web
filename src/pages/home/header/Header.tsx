@@ -14,10 +14,14 @@ import { Container } from "../Container"
 import { bus } from "~/utils"
 import { Layout } from "./layout"
 import { isMac } from "~/utils/compatibility"
+import { Link } from "@solidjs/router"
+import { AnchorWithBase } from "~/components"
+import { useT } from "~/hooks"
+import { me } from "~/store"
+import { UserMethods } from "~/types"
 
 export const Header = () => {
-  const logos = getSetting("logo").split("\n")
-  const logo = useColorModeValue(logos[0], logos.pop())
+  const t = useT()
   return (
     <Center
       class="header"
@@ -32,40 +36,23 @@ export const Header = () => {
           justifyContent="space-between"
         >
           <HStack class="header-left" h="44px">
+			  <Layout />
+          </HStack>
+          <HStack class="header-center" h="44px">
             <Image
-              src={logo()!}
+              src="https://cdn.jsdelivr.net/gh/WangMuchun/SVG-Free@main/SVG/download.svg"
               h="$full"
               w="auto"
               fallback={<CenterLoading />}
             />
           </HStack>
           <HStack class="header-right" spacing="$2">
-            <Show when={objStore.state === State.Folder}>
-              <Show when={getSetting("search_index") !== "none"}>
-                <HStack
-                  bg="$neutral4"
-                  w="$32"
-                  p="$2"
-                  rounded="$md"
-                  justifyContent="space-between"
-                  border="2px solid transparent"
-                  cursor="pointer"
-                  _hover={{
-                    borderColor: "$info6",
-                  }}
-                  onClick={() => {
-                    bus.emit("tool", "search")
-                  }}
-                >
-                  <Icon as={BsSearch} />
-                  <HStack>
-                    {isMac ? <Kbd>Cmd</Kbd> : <Kbd>Ctrl</Kbd>}
-                    <Kbd>K</Kbd>
-                  </HStack>
-                </HStack>
-              </Show>
-              <Layout />
-            </Show>
+			<AnchorWithBase
+			  as={Link}
+			  href={UserMethods.is_guest(me()) ? "/@login" : "/@manage"}
+			>
+			  {t(UserMethods.is_guest(me()) ? "login.login" : "home.footer.manage")}
+			</AnchorWithBase>
           </HStack>
         </HStack>
       </Container>
